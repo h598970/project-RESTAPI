@@ -31,7 +31,7 @@ namespace DAT250_REST.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Poll>> GetPoll(string id)
         {
-            var poll = await _context.Polls.FindAsync(id);
+            var poll = await _context.Polls.Include(x => x.Options).FirstOrDefaultAsync(x => x.Id == id);
 
             if (poll == null)
             {
