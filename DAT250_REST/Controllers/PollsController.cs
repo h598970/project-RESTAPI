@@ -1,4 +1,4 @@
-﻿
+﻿    
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DAT250_REST.Data;
@@ -23,7 +23,8 @@ namespace DAT250_REST.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Poll>>> GetPolls()
         {
-            return await _context.Polls.ToListAsync();
+            return await _context.Polls.Include(p => p.Options).
+                ToListAsync();
         }
 
         // GET: api/Polls/5
