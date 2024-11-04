@@ -15,5 +15,6 @@
         public DateTime PublishedAt { get; set; }
         public DateTime ValidUntil { get; set; }
         public List<VoteOption>? Options { get; set; } 
+        public required User Creator { get; set; }
     }
 }

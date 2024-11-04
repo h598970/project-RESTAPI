@@ -12,6 +12,7 @@ namespace DAT250_REST.Models
         public DateTime PublishedAt {  get; set; }
         public Poll? Poll { get; set; }
         public User? User { get; set; }
+        public required VoteOption Option { get; set; }
 
 
     }
