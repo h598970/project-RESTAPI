@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DAT250_REST.Data
 {
-    public class AppDBContext: IdentityDbContext
+    public partial class AppDBContext: IdentityDbContext
     {
         protected readonly IConfiguration Configuration;
         public AppDBContext(IConfiguration Configuration)
