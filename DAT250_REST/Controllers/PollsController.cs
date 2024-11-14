@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using DAT250_REST.Data;
 using DAT250_REST.Models;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Identity;
 
 namespace DAT250_REST.Controllers
 {
@@ -75,8 +77,19 @@ namespace DAT250_REST.Controllers
         // POST: api/Polls
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Poll>> PostPoll(Poll poll)
+        public async Task<ActionResult<Poll>> PostPoll(PollDto pollDto)
         {
+            var userId = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var creator = await _context.Users.FindAsync(userId);
+
+            Poll poll = new()
+            {
+                Creator = creator,
+                Question = pollDto.Question,
+                ValidUntil = pollDto.ValidUntil,
+                PublishedAt = pollDto.PublishedAt,
+                Options = pollDto.Options
+            };
             _context.Polls.Add(poll);
             await _context.SaveChangesAsync();
 
@@ -102,6 +115,14 @@ namespace DAT250_REST.Controllers
         private bool PollExists(string id)
         {
             return _context.Polls.Any(e => e.Id == id);
+        }
+
+        public class PollDto
+        {
+            public required String Question { get; set; }
+            public DateTime PublishedAt { get; set; }
+            public DateTime ValidUntil { get; set; }
+            public required List<VoteOption> Options { get; set; }
         }
     }
 }

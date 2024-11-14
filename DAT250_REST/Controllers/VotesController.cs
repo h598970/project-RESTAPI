@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using DAT250_REST.Data;
 using DAT250_REST.Models;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace DAT250_REST.Controllers
 {
@@ -73,8 +74,19 @@ namespace DAT250_REST.Controllers
         // POST: api/Votes
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Vote>> PostVote(Vote vote)
+        public async Task<ActionResult<Vote>> PostVote(VoteDto voteDto)
         {
+            var userId = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var creator = await _context.Users.FindAsync(userId);
+
+            Vote vote = new()
+            {
+                Option = await _context.VoteOptions.FindAsync(voteDto.OptionId),
+                Poll = await _context.Polls.FindAsync(voteDto.PollId),
+                PublishedAt = voteDto.PublishedAt,
+                User = creator
+            };
+
             _context.Votes.Add(vote);
             await _context.SaveChangesAsync();
 
@@ -100,6 +112,13 @@ namespace DAT250_REST.Controllers
         private bool VoteExists(int id)
         {
             return _context.Votes.Any(e => e.Id == id);
+        }
+
+        public class VoteDto
+        {
+            public required String PollId { get; set; }
+            public required int OptionId { get; set; }
+            public DateTime PublishedAt { get; set; }
         }
     }
 }
