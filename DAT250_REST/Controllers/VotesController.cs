@@ -81,8 +81,8 @@ namespace DAT250_REST.Controllers
 
             Vote vote = new()
             {
-                Option = await _context.VoteOptions.FindAsync(voteDto.OptionId),
-                Poll = await _context.Polls.FindAsync(voteDto.PollId),
+                Option = await _context.VoteOptions.FindAsync(voteDto.OptionId) ?? throw new InvalidOperationException("No voteoptions found for: " + voteDto.OptionId),
+                Poll = await _context.Polls.FindAsync(voteDto.PollId) ?? throw new InvalidOperationException("No poll found with pollid: " + voteDto.PollId),
                 PublishedAt = voteDto.PublishedAt,
                 User = creator
             };

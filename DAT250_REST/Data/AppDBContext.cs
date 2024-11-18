@@ -16,10 +16,10 @@ namespace DAT250_REST.Data
         {
             Options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection"));
         }
-        public DbSet<Poll> Polls { get; set; }
-        public DbSet<User> Users { get; set; }
-        public DbSet<Vote> Votes { get; set; }
-        public DbSet<VoteOption> VoteOptions { get; set; }
+        public required DbSet<Poll> Polls { get; set; }
+        public required new DbSet<User> Users { get; set; }
+        public required DbSet<Vote> Votes { get; set; }
+        public required DbSet<VoteOption> VoteOptions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

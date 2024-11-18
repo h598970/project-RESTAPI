@@ -80,7 +80,7 @@ namespace DAT250_REST.Controllers
         public async Task<ActionResult<Poll>> PostPoll(PollDto pollDto)
         {
             var userId = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var creator = await _context.Users.FindAsync(userId);
+            var creator = await _context.Users.FindAsync(userId) ?? throw new InvalidOperationException("No user found with userid:" + userId);
 
             Poll poll = new()
             {
