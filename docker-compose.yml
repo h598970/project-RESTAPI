@@ -1,0 +1,24 @@
+version: '3.4'
+services:
+  postgres:
+    image: postgres
+    environment:
+      - POSTGRES_USER=dat250
+      - POSTGRES_PASSWORD=dat250pass
+      - POSTGRES_DB=dat250
+    volumes:
+      - ./volumes/data/db:/var/lib/postgresql/data
+    ports:
+       - 5432:5432
+
+api:
+    build:
+        context: .
+        dockerfile: Dockerfile
+    environment:
+        - ConnectionStrings__DefaultConnection=Host=postgres;Database=dat250;Username=dat250;Password=dat250pass
+    depends_on:
+        - postgres
+    ports:
+        - 5000:5000
+        - 5001:5001
