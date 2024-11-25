@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DAT250_REST.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -166,14 +166,14 @@ namespace DAT250_REST.Migrations
                     Question = table.Column<string>(type: "text", nullable: true),
                     PublishedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     ValidUntil = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UserId = table.Column<string>(type: "text", nullable: true)
+                    CreatorId = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Polls", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Polls_AspNetUsers_UserId",
-                        column: x => x.UserId,
+                        name: "FK_Polls_AspNetUsers_CreatorId",
+                        column: x => x.CreatorId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id");
                 });
@@ -206,7 +206,8 @@ namespace DAT250_REST.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     PublishedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     PollId = table.Column<string>(type: "text", nullable: true),
-                    UserId = table.Column<string>(type: "text", nullable: true)
+                    UserId = table.Column<string>(type: "text", nullable: true),
+                    OptionId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -221,6 +222,12 @@ namespace DAT250_REST.Migrations
                         column: x => x.PollId,
                         principalTable: "Polls",
                         principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Votes_VoteOptions_OptionId",
+                        column: x => x.OptionId,
+                        principalTable: "VoteOptions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -261,14 +268,19 @@ namespace DAT250_REST.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Polls_UserId",
+                name: "IX_Polls_CreatorId",
                 table: "Polls",
-                column: "UserId");
+                column: "CreatorId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_VoteOptions_PollId",
                 table: "VoteOptions",
                 column: "PollId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Votes_OptionId",
+                table: "Votes",
+                column: "OptionId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Votes_PollId",
@@ -300,13 +312,13 @@ namespace DAT250_REST.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "VoteOptions");
-
-            migrationBuilder.DropTable(
                 name: "Votes");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "VoteOptions");
 
             migrationBuilder.DropTable(
                 name: "Polls");
