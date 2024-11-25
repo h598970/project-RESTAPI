@@ -1,0 +1,51 @@
+services:
+  postgres:
+    image: postgres
+    environment:
+      - POSTGRES_USER=dat250
+      - POSTGRES_PASSWORD=dat250pass
+      - POSTGRES_DB=dat250
+    ports:
+      - 5432:5432
+    volumes:
+      - ./DAT250_REST/initial_schema.sql:/docker-entrypoint-initdb.d/initial_schema.sql
+       
+  api:
+    build:
+        context: .
+        dockerfile: Dockerfile
+    environment:
+        - ConnectionStrings__DefaultConnection=Host=postgres;Database=dat250;Username=dat250;Password=dat250pass
+    depends_on:
+        - postgres
+    ports:
+        - 8080:8080
+        - 8081:8081
+  
+  mongodb:
+    image: 'mongo:latest'
+    environment:
+      - 'MONGO_INITDB_DATABASE=mydatabase'
+      - 'MONGO_INITDB_ROOT_PASSWORD=secret'
+      - 'MONGO_INITDB_ROOT_USERNAME=root'
+    ports:
+      - '27018:27017'
+  rabbitmq:
+    image: 'rabbitmq:latest'
+    environment:
+      - 'RABBITMQ_DEFAULT_PASS=secret'
+      - 'RABBITMQ_DEFAULT_USER=myuser'
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+
+  messaging:
+    build:
+      context: https://github.com/Thorbjorn2021/project-Messaging.git
+      dockerfile: Dockerfile
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://root:secret@mongodb:27017/messaging-db
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: myuser
+      SPRING_RABBITMQ_PASSWORD: secret

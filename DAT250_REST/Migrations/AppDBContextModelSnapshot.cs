@@ -17,7 +17,7 @@ namespace DAT250_REST.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.10")
+                .HasAnnotation("ProductVersion", "8.0.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -28,13 +28,13 @@ namespace DAT250_REST.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("text");
 
+                    b.Property<string>("CreatorId")
+                        .HasColumnType("text");
+
                     b.Property<DateTime>("PublishedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Question")
-                        .HasColumnType("text");
-
-                    b.Property<string>("UserId")
                         .HasColumnType("text");
 
                     b.Property<DateTime>("ValidUntil")
@@ -42,7 +42,7 @@ namespace DAT250_REST.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("CreatorId");
 
                     b.ToTable("Polls");
                 });
@@ -55,6 +55,9 @@ namespace DAT250_REST.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("OptionId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("PollId")
                         .HasColumnType("text");
 
@@ -65,6 +68,8 @@ namespace DAT250_REST.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("OptionId");
 
                     b.HasIndex("PollId");
 
@@ -311,13 +316,21 @@ namespace DAT250_REST.Migrations
 
             modelBuilder.Entity("DAT250_REST.Models.Poll", b =>
                 {
-                    b.HasOne("DAT250_REST.Models.User", null)
+                    b.HasOne("DAT250_REST.Models.User", "Creator")
                         .WithMany("PollsCreated")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("CreatorId");
+
+                    b.Navigation("Creator");
                 });
 
             modelBuilder.Entity("DAT250_REST.Models.Vote", b =>
                 {
+                    b.HasOne("DAT250_REST.Models.VoteOption", "Option")
+                        .WithMany()
+                        .HasForeignKey("OptionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("DAT250_REST.Models.Poll", "Poll")
                         .WithMany()
                         .HasForeignKey("PollId");
@@ -325,6 +338,8 @@ namespace DAT250_REST.Migrations
                     b.HasOne("DAT250_REST.Models.User", "User")
                         .WithMany("Votes")
                         .HasForeignKey("UserId");
+
+                    b.Navigation("Option");
 
                     b.Navigation("Poll");
 
