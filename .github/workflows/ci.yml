@@ -26,13 +26,7 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # Step 3: Set up Docker Compose
-      - name: Set up Docker Compose
-        run: |
-          docker compose version || curl -L "https://github.com/docker/compose/releases/download/v2.20.0/docker-compose-linux-x86_64" -o /usr/local/bin/docker-compose
-          chmod +x /usr/local/bin/docker-compose
-
-      # Step 4: Build and push images with Docker Compose
+      # Step 3: Build and push images with Docker Compose
       - name: Build and Push Images
         env:
           DOCKER_BUILDKIT: 1  # Enable BuildKit for better performance
