@@ -1,35 +1,41 @@
-name: Publish Docker image with Docker Compose
+name: Build, Push, and Deploy to Azure
 
 on:
-  release:
-    types: [published]
+  push:
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
-  push_to_registry:
-    name: Push Docker image to Docker Hub using Docker Compose
+  build-and-push:
+    name: Build and Push Docker Images
     runs-on: ubuntu-latest
-    permissions:
-      packages: write
-      contents: read
-      attestations: write
-      id-token: write
 
     steps:
-      # Step 1: Check out the repository
-      - name: Check out the repository
-        uses: actions/checkout@v4
+    # Step 1: Check out the repository
+    - name: Checkout Code
+      uses: actions/checkout@v4
 
-      # Step 2: Log in to Docker Hub
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+    # Step 2: Log in to Azure Container Registry
+    - name: Log in to Azure Container Registry
+      uses: azure/docker-login@v2
+      with:
+        login-server: registerdat250.azurecr.io
+        username: ${{ secrets.AZURE_ACR_USERNAME }}
+        password: ${{ secrets.AZURE_ACR_PASSWORD }}
 
-      # Step 3: Build and push images with Docker Compose
-      - name: Build and Push Images
-        env:
-          DOCKER_BUILDKIT: 1  # Enable BuildKit for better performance
-        run: |
-          docker compose -f docker-compose.yml build
-          docker compose -f docker-compose.yml push
+    # Step 3: Build and push Docker images
+    - name: Build and Push API Image
+      uses: docker/build-push-action@v6
+      with:
+        context: .
+        push: true
+        tags: registerdat250.azurecr.io/api:latest
+
+    - name: Build and Push Messaging Image
+      uses: docker/build-push-action@v6
+      with:
+        context: https://github.com/Thorbjorn2021/project-Messaging.git
+        push: true
+        tags: registerdat250.azurecr.io/messaging:latest
+
